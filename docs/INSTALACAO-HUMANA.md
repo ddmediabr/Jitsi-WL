@@ -1,5 +1,9 @@
 # Instalação — etapas humanas
 
+> **O design é uma cópia exata da instalação de referência.** O visual (telas, cores, tipografia, animações, textos) não
+> se altera numa instalação: o cliente só personaliza a identidade da empresa no painel (nome, logos, favicon, e, se
+> quiser, cores e textos). Veja [DESIGN.md](DESIGN.md).
+
 Quem instala é uma LLM com acesso ao Coolify pelo MCP. O roteiro dela está em [ROADMAP-LLM.md](ROADMAP-LLM.md). Este
 documento lista **o que só uma pessoa pode fazer**: contratar e configurar contas externas, DNS, firewall, criar tokens
 na interface do Coolify, criar o primeiro administrador e personalizar a marca.
@@ -118,6 +122,10 @@ Entregue o usuário e a senha à LLM, se ela for rodar o teste automatizado.
 
 ## DEPOIS — 1. Personalização da marca (painel, como proprietário)
 
+**Sem mexer em nada, a instalação já sai idêntica à de referência** (paleta azul, tema escuro, fundo da entrada em vídeo,
+textos e e-mails padrão). Para ser da empresa, bastam o **nome**, os **logos** e o **favicon**. O resto da tabela abaixo é
+opcional e só deve mudar se o cliente pedir.
+
 | Menu | O que ajustar |
 |---|---|
 | **Personalização** | Nome da marca, logo do tema escuro e do claro (PNG/JPG/WebP até 2 MB; o logo substitui o nome), favicon, paleta e cor de destaque de cada tema, cor do texto dos botões, tema padrão, fundo das páginas de entrada (imagem ou vídeo até 10 MB), textos do hall (`/`), textos das páginas de saída (saiu, removido, encerrada), modelo do e-mail da gravação e a cor dos e-mails |
@@ -133,7 +141,22 @@ Entregue o usuário e a senha à LLM, se ela for rodar o teste automatizado.
 - **Salas**: nome (vira o endereço `https://<domínio>/<sala>`), moderadores, usuários comuns, sala exclusiva, sala de
   espera, sala com senha, quem pode iniciar (moderador interino), sala temporária.
 
-## DEPOIS — 3. Teste de aceite (com aparelhos reais)
+## DEPOIS — 3. Conferência do design
+
+A LLM já confere o código e as configurações (ROADMAP-LLM, Fase 9). A conferência visual é sua, nos temas **escuro e claro**,
+em **1440 px e 390 px** de largura:
+
+- [ ] Hall `https://<domínio>/` e uma sala (escolha cadastrado ou convidado).
+- [ ] Login do painel e "esqueci a senha".
+- [ ] Painel: Visão geral, Salas, Contas, Personalização, Gravações, Configurações.
+- [ ] Dentro da sala: barra do Jitsi, menu de moderação e sala de espera.
+- [ ] Um e-mail de teste (gravação ou redefinir senha).
+- [ ] Tudo igual à instalação de referência. **Só podem ser diferentes** o nome da marca, os logos e o favicon.
+- [ ] Nenhum nome ou logo de outra empresa aparece em lugar nenhum.
+
+Se algo estiver diferente, **não corrija no código**: avise o dono do produto (veja [DESIGN.md](DESIGN.md)).
+
+## DEPOIS — 4. Teste de aceite (com aparelhos reais)
 
 - [ ] Celular em rede 4G (fora do Wi-Fi do servidor) entra como convidado e cai na sala de espera. O moderador aprova, e
       áudio e vídeo funcionam dos dois lados.
@@ -143,7 +166,7 @@ Entregue o usuário e a senha à LLM, se ela for rodar o teste automatizado.
 - [ ] "Esqueci a senha" no painel envia o e-mail.
 - [ ] Depois do aceite, apague a sala e a conta de teste.
 
-## DEPOIS — 4. Guarda dos segredos
+## DEPOIS — 5. Guarda dos segredos
 
 A LLM gera os segredos da instalação em `build/secrets.env`, na máquina dela. Os valores já estão no Coolify, que é a
 fonte. Guarde esse arquivo num cofre de senhas do cliente, ou peça para a LLM apagá-lo. **Ele não vai para o Git.**

@@ -25,6 +25,10 @@ no momento indicado.
    comando para `true` e desligue a tarefa.
 7. **`restart` não reaplica** compose, variáveis nem domínios. Use `manage_service update` com `instant_deploy: true`, ou
    `deploy`, no app.
+8. **O DESIGN É UMA CÓPIA EXATA DA REFERÊNCIA (regra número 1).** Você instala; você não redesenha. Não edite CSS, componentes,
+   tokens, fontes, ícones, textos fixos, animações, o Dockerfile do painel nem a ponte com o Jitsi (`panel/src/lib/jitsi.ts`),
+   e não troque a imagem do Jitsi. O que é da empresa (nome, logos, favicon, cores, textos) é o humano quem escolhe, no painel,
+   depois da instalação. Leia [DESIGN.md](DESIGN.md). Se achar que algo no visual deve mudar, pare e avise o humano.
 
 ## Fase 0 — Pré-requisitos e descoberta
 
@@ -37,11 +41,14 @@ no momento indicado.
    `install.values` e preencha `DOMAIN`, `PUBLIC_IP`, `TZ` e `BRAND_NAME`.
 5. Rode `python tools/render_templates.py install.values`. Isso cria `build/secrets.env`.
 6. Crie o projeto (`manage_project`), com o nome da marca e o ambiente `production`.
+7. **Confira que o repositório que você vai instalar está com o design de referência:** `python tools/check_design.py`
+   deve imprimir `DESIGN OK`. Se não imprimir, pare: o repositório foi alterado.
 
 **Checagem:**
 - o DNS do domínio resolve para `PUBLIC_IP` (`nslookup <domínio>`);
 - `https://<domínio>` ainda dá 404 ou 503 do Traefik (nenhum recurso usa o domínio);
-- `build/secrets.env` existe com 13 chaves.
+- `build/secrets.env` existe com 13 chaves;
+- `python tools/check_design.py` imprime `DESIGN OK`.
 
 ## Fase 1 — Banco do painel
 
@@ -117,7 +124,9 @@ no momento indicado.
 - `get_deployment` dá `finished`;
 - `get_logs` mostra `[painel] migrações do banco aplicadas`, sem `política não sincronizada` nem
   `Variáveis de ambiente inválidas`;
-- `curl -s https://<domínio>/_flow-test/flow-api/health` dá 200.
+- `curl -s https://<domínio>/_flow-test/flow-api/health` dá 200;
+- as migrações aplicaram o fundo de referência da entrada (`0025_design_reference`): confira na Fase 9 com
+  `scripts/export-settings.mjs`.
 
 ## Fase 4 — Regras do Traefik (humano aplica)
 
@@ -209,14 +218,30 @@ namespace de rede antigo.
 **Checagem:** todos os itens passaram. Mídia sem áudio ou vídeo entre redes diferentes indica UDP 10000 fechado ou
 `JVB_ADVERTISE_IPS` errado.
 
-## Fase 9 — Verificação de segurança
+## Fase 9 — Conferência do design
+
+O resultado tem que ser uma cópia exata da referência. Faça, nesta ordem:
+1. `python tools/check_design.py` imprime `DESIGN OK` (nenhum arquivo de design foi alterado).
+2. Crie uma tarefa agendada no app do painel com `node scripts/export-settings.mjs`, execute, leia o resultado e **apague a
+   tarefa**. Confira:
+   - `entry_bg` igual ao de [DESIGN.md](DESIGN.md) (vídeo `faiscas`);
+   - `palette` ausente ou `azul`, `default_theme` ausente ou `dark`, sem `accent_color` manual;
+   - `ASSETS` vazio (o cliente ainda não enviou logos).
+3. Abra as telas públicas (`/`, uma sala, `/settings/login`) nos temas escuro e claro e confirme que não há texto de outra
+   empresa, que o nome mostrado é o `BRAND_NAME` e que o fundo da entrada é o vídeo.
+4. Peça ao humano a conferência visual completa de [DESIGN.md](DESIGN.md), "Como conferir uma instalação", item 3.
+
+**Checagem:** os quatro itens passaram. Qualquer diferença volta à fase responsável. Nunca "conserte" mexendo no código de
+design.
+
+## Fase 10 — Verificação de segurança
 
 1. Rode toda a seção "Verificação de cada instalação" de [SEGURANCA.md](SEGURANCA.md).
 2. Teste as portas TCP de fora (por exemplo, `curl --connect-timeout 5 http://<ip>:8000`, que deve falhar).
 
 **Checagem:** todos os itens marcados. Qualquer falha volta à fase responsável.
 
-## Fase 10 — Entrega
+## Fase 11 — Entrega
 
 1. **Tarefas agendadas:** nenhuma ativa. As usadas ficam com o comando `true` e desligadas (`list_scheduled_tasks` em
    cada recurso).

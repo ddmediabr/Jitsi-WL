@@ -13,13 +13,28 @@ Jitsi Meet auto-hospedado com um painel próprio. Cada cliente recebe a sua inst
 Toda a infraestrutura roda no **Coolify** e é instalada por uma LLM com o MCP do Coolify, seguindo o roteiro deste
 repositório.
 
+## Regra número 1: o design é uma CÓPIA EXATA da instalação de referência
+
+Toda instalação nova deve sair **visualmente idêntica** à de referência: mesmas telas, mesmos componentes, mesmos
+espaçamentos, mesmas cores e temas, mesmas animações, mesmo texto. O que muda de um cliente para outro é **só a identidade
+da empresa**, escolhida no painel em Personalização: nome, logos, favicon e, se o cliente quiser, cores e textos. Mais nada.
+
+Por isso, quem instala (humano ou LLM):
+- **não altera** CSS, componentes, tokens (`panel/src/app/globals.css`), fontes, ícones, animações, textos fixos nem o
+  Dockerfile do painel. Nenhuma "melhoria" visual na instalação de um cliente;
+- **não troca** a imagem do Jitsi nem a ponte com ele (`panel/src/lib/jitsi.ts`): o visual da sala depende da versão fixada;
+- **confere o resultado** com o checklist "Conferência do design" de [docs/INSTALACAO-HUMANA.md](docs/INSTALACAO-HUMANA.md)
+  e a seção [docs/DESIGN.md](docs/DESIGN.md);
+- se achar que algo no design precisa mudar, **para e avisa o humano**: a mudança vai para o código de referência e vale
+  para todas as instalações, não só para uma.
+
 ## Por onde começar
 
 | Quem | Leia |
 |---|---|
 | Quem vai contratar e preparar a instalação | [docs/INSTALACAO-HUMANA.md](docs/INSTALACAO-HUMANA.md) |
 | A LLM que vai instalar | [docs/ROADMAP-LLM.md](docs/ROADMAP-LLM.md) (depois de ARQUITETURA e SEGURANCA) |
-| Quem vai entender ou manter o sistema | [docs/ARQUITETURA.md](docs/ARQUITETURA.md), [docs/SEGURANCA.md](docs/SEGURANCA.md), [docs/OPERACAO.md](docs/OPERACAO.md), [docs/TRANSCRICAO.md](docs/TRANSCRICAO.md) |
+| Quem vai entender ou manter o sistema | [docs/ARQUITETURA.md](docs/ARQUITETURA.md), [docs/DESIGN.md](docs/DESIGN.md), [docs/SEGURANCA.md](docs/SEGURANCA.md), [docs/OPERACAO.md](docs/OPERACAO.md), [docs/TRANSCRICAO.md](docs/TRANSCRICAO.md) |
 | Quem vai mexer no código do painel | [panel/README.md](panel/README.md) |
 
 ## Estrutura

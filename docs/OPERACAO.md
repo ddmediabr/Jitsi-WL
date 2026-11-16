@@ -2,6 +2,10 @@
 
 ## Atualizar o painel
 
+O código do painel é o de **referência**: não se edita numa instalação (DESIGN.md). Para levar uma atualização, aponte a
+instalação para a versão nova do repositório e faça o deploy. Se a atualização mudar o design, o dono do produto atualiza o
+`docs/design.lock` no mesmo commit, e as instalações existentes passam a divergir da nova referência até serem atualizadas.
+
 O app do painel acompanha o branch do repositório no Coolify. Um push no branch dispara o deploy pelo webhook, ou rode
 `deploy` pelo MCP. As migrações rodam sozinhas no início. O log mostra `[painel] migrações do banco aplicadas`. Se uma
 migração falhar, o painel não sobe e o Coolify mantém a versão anterior no ar.
@@ -75,6 +79,7 @@ Rode por uma tarefa agendada do app do painel. Depois de usar, troque o comando 
 |---|---|
 | `node scripts/verify-db.mjs` | Confere que o usuário `panel_app` NÃO consegue o que não deve (DDL, apagar auditoria etc.) |
 | `node scripts/audit-tail.mjs 30` | Últimos eventos da auditoria, só leitura |
+| `node scripts/export-settings.mjs` | Configurações de design e tipo/tamanho dos logos (sem o conteúdo), só leitura. Serve para conferir o design de uma instalação (DESIGN.md) |
 | `sh -c "CONFIRM_RESET=yes node scripts/reset-admin.mjs"` | **Break-glass:** apaga TODOS os administradores, sessões e 2FA para `/settings/setup` voltar. A auditoria fica e registra o reset. Precisa de um `SETUP_TOKEN` novo depois |
 
 ## Problemas comuns

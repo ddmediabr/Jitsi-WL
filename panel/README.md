@@ -57,6 +57,11 @@ Visão geral do sistema: [../docs/ARQUITETURA.md](../docs/ARQUITETURA.md).
   - durações: pressão 140 ms, UI 200 ms, painel 320 ms;
   - entradas partem de `scale(0.97)`, nunca de 0;
   - `prefers-reduced-motion` mantém só o fade.
+- **Design de referência:** toda instalação é uma cópia exata do visual deste código. Não se altera CSS, componentes, tokens,
+  fontes, ícones, animações nem textos fixos por instalação: o cliente só troca nome, logos, favicon, cores e textos em
+  Personalização (dados no banco). A assinatura dos arquivos de design fica em `../docs/design.lock` e é conferida por
+  `python ../tools/check_design.py`. Uma mudança de design intencional atualiza o lock no mesmo commit
+  (veja [../docs/DESIGN.md](../docs/DESIGN.md)).
 - **Marca (white label):**
   - identidade nos tokens de `src/app/globals.css` e em Personalização (nome, logos, favicon, paleta, cor de destaque,
     tema padrão);
