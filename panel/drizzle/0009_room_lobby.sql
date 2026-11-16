@@ -1,0 +1,1 @@
+ALTER TABLE "rooms" ADD COLUMN "lobby" boolean DEFAULT true NOT NULL;

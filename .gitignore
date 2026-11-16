@@ -1,0 +1,10 @@
+# Arquivos de UMA instalação: segredos e valores do cliente. Nunca versionar.
+/build/
+/install.values
+*.env
+!*.env.template
+
+# Ferramentas
+__pycache__/
+.DS_Store
+Thumbs.db

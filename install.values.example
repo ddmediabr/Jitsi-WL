@@ -1,0 +1,24 @@
+# Copie para `install.values` (fora do Git) e preencha. Use com: python tools/render_templates.py install.values
+# Os uuids só existem depois de criar cada recurso no Coolify: preencha conforme o ROADMAP-LLM avança e rode o script de novo.
+
+# Domínio da instalação, sem https:// (o registro DNS tipo A precisa apontar para PUBLIC_IP).
+DOMAIN=meet.cliente.com.br
+# IP público do servidor (mídia UDP 10000).
+PUBLIC_IP=203.0.113.10
+# Fuso horário IANA (gravador e padrão do painel).
+TZ=America/Sao_Paulo
+# Nome da marca do cliente (até 40 caracteres).
+BRAND_NAME=Cliente Meet
+
+# uuids do Coolify (preenchidos pela LLM durante a instalação).
+DB_UUID=
+JITSI_SERVICE_UUID=
+PANEL_APP_UUID=
+JIBRI_SERVICE_UUID=
+
+# Opcionais (entregues pelo humano; vazio = recurso desligado).
+RESEND_API_KEY=
+MAIL_FROM=
+GEMINI_API_KEY=
+COOLIFY_URL=
+COOLIFY_API_TOKEN=

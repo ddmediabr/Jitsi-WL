@@ -1,0 +1,62 @@
+# /data/coolify/proxy/dynamic/jitsi-flow.yaml (Coolify > Servers > localhost > Proxy > Dynamic Configurations).
+# O Traefik recarrega o arquivo sozinho (providers.file.watch=true), sem reiniciar o proxy.
+#
+# Marcadores: {{DOMAIN}} e {{PANEL_APP_UUID}} (uuid do app do painel no Coolify). O serviço
+# `https-0-{{PANEL_APP_UUID}}@docker` só existe enquanto o app do painel tiver um domínio no Coolify
+# (`https://{{DOMAIN}}/_flow-test`): NÃO remova esse domínio.
+#
+# Roteamento: tudo que é do painel (assets, /flow-api, /settings) e a navegação de documento para uma sala
+# vão para o painel; o resto cai no Jitsi. Limites de requisição por IP de origem:
+#   - rl-auth:  login da sala e rota "closed" (tentativas de senha): 20 por minuto, rajada de 10.
+#   - rl-flow:  demais chamadas do painel (/flow-api e /settings): 300 por minuto, rajada de 150.
+# Acima do limite o Traefik responde 429 antes de chegar ao painel. O limite do aplicativo continua valendo.
+
+http:
+  middlewares:
+    rl-auth:
+      rateLimit:
+        average: 20
+        period: 1m
+        burst: 10
+    rl-flow:
+      rateLimit:
+        average: 300
+        period: 1m
+        burst: 150
+  routers:
+    jitsi-flow-auth:
+      entryPoints:
+        - https
+      rule: "Host(`{{DOMAIN}}`) && (PathPrefix(`/flow-api/login`) || PathPrefix(`/flow-api/closed`))"
+      priority: 5100
+      middlewares:
+        - rl-auth
+      service: https-0-{{PANEL_APP_UUID}}@docker
+      tls:
+        certResolver: letsencrypt
+    jitsi-flow-api:
+      entryPoints:
+        - https
+      rule: "Host(`{{DOMAIN}}`) && (PathPrefix(`/flow-api`) || PathPrefix(`/settings`))"
+      priority: 5050
+      middlewares:
+        - rl-flow
+      service: https-0-{{PANEL_APP_UUID}}@docker
+      tls:
+        certResolver: letsencrypt
+    jitsi-flow-reserved:
+      entryPoints:
+        - https
+      rule: "Host(`{{DOMAIN}}`) && (PathPrefix(`/_next`) || PathPrefix(`/_flow`) || PathPrefix(`/flow-api`) || PathPrefix(`/settings`))"
+      priority: 5000
+      service: https-0-{{PANEL_APP_UUID}}@docker
+      tls:
+        certResolver: letsencrypt
+    jitsi-flow-document:
+      entryPoints:
+        - https
+      rule: "Host(`{{DOMAIN}}`) && HeaderRegexp(`Sec-Fetch-Dest`, `^document$`) && HeaderRegexp(`Sec-Fetch-Mode`, `^navigate$`) && PathRegexp(`^/[^/.]*$`)"
+      priority: 5001
+      service: https-0-{{PANEL_APP_UUID}}@docker
+      tls:
+        certResolver: letsencrypt

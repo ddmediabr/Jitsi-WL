@@ -1,0 +1,71 @@
+# Serviço do GRAVADOR (Jibri) no Coolify: "Docker Compose Empty", colado depois de renderizado (tools/render_templates.py).
+# Marcadores: {{DOMAIN}}, {{JIBRI_SERVICE_UUID}} (uuid DESTE serviço, para montar os arquivos em /src),
+# {{JITSI_SERVICE_UUID}} (a rede do serviço do Jitsi tem o nome do uuid dele), {{TZ}}.
+# Segredos (variáveis do serviço no Coolify): JIBRI_XMPP_PASSWORD e JIBRI_RECORDER_PASSWORD (IGUAIS às do serviço do Jitsi)
+# e DDMEDIA_INGEST_SECRET (IGUAL a RECORDING_INGEST_SECRET do painel).
+# Arquivos do serviço (file storages, montados em /src): ddmedia-finalize.sh e ddmedia-web-proxy.conf.
+services:
+  perms:
+    image: 'alpine:3.20'
+    restart: 'no'
+    command: ['sh', '-c', 'cp /src/ddmedia-finalize.sh /config/ddmedia-finalize.sh && chmod 755 /config/ddmedia-finalize.sh && chown -R 995:997 /recordings /config && chmod 770 /recordings']
+    volumes:
+      - 'jibri-recordings:/recordings'
+      - 'jibri-config:/config'
+      - '/data/coolify/services/{{JIBRI_SERVICE_UUID}}/src:/src:ro'
+  jibri:
+    image: 'ghcr.io/jitsi/jibri:stable-11248-3'
+    restart: unless-stopped
+    depends_on:
+      perms:
+        condition: service_completed_successfully
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - '/dev/snd:/dev/snd'
+    shm_size: 2gb
+    # Ao iniciar, pergunta ao painel a resolucao escolhida em Gravacoes > Configuracoes (texto "LxA"); sem resposta, vale JIBRI_RECORDING_RESOLUTION abaixo.
+    entrypoint: ['/bin/sh', '-c', 'R=$$(curl -fsS --max-time 10 -H "Authorization: Bearer $$DDMEDIA_INGEST_SECRET" https://{{DOMAIN}}/flow-api/recording-config 2>/dev/null); case "$$R" in [0-9]*x[0-9]*) export JIBRI_RECORDING_RESOLUTION="$$R";; esac; exec /init']
+    volumes:
+      - 'jibri-recordings:/recordings'
+      - 'jibri-config:/config'
+    environment:
+      - PUBLIC_URL=http://localhost:8000
+      - XMPP_AUTH_DOMAIN=auth.meet.jitsi
+      - XMPP_INTERNAL_MUC_DOMAIN=internal-muc.meet.jitsi
+      - XMPP_RECORDER_DOMAIN=recorder.meet.jitsi
+      - XMPP_HIDDEN_DOMAIN=recorder.meet.jitsi
+      - XMPP_SERVER=prosody
+      - XMPP_DOMAIN=meet.jitsi
+      - JIBRI_XMPP_USER=jibri
+      - JIBRI_XMPP_PASSWORD=${JIBRI_XMPP_PASSWORD}
+      - JIBRI_BREWERY_MUC=jibribrewery
+      - JIBRI_RECORDER_USER=recorder
+      - JIBRI_RECORDER_PASSWORD=${JIBRI_RECORDER_PASSWORD}
+      - JIBRI_RECORDING_DIR=/recordings
+      - JIBRI_RECORDING_RESOLUTION=1600x900
+      - JIBRI_STRIP_DOMAIN_JID=muc
+      - JIBRI_LOGS_DIR=/config/logs
+      - JIBRI_FINALIZE_RECORDING_SCRIPT_PATH=/config/ddmedia-finalize.sh
+      - DDMEDIA_INGEST_SECRET=${DDMEDIA_INGEST_SECRET}
+      - DDMEDIA_INGEST_URL=https://{{DOMAIN}}/flow-api/recordings/ingest
+      - DISPLAY=:0
+      - TZ={{TZ}}
+    networks:
+      - jitsi
+  webproxy:
+    image: 'nginx:1.27-alpine'
+    restart: unless-stopped
+    network_mode: 'service:jibri'
+    depends_on:
+      - jibri
+    command: ['nginx', '-c', '/src/ddmedia-web-proxy.conf', '-g', 'daemon off;']
+    volumes:
+      - '/data/coolify/services/{{JIBRI_SERVICE_UUID}}/src:/src:ro'
+volumes:
+  jibri-config: {}
+  jibri-recordings: {}
+networks:
+  jitsi:
+    name: {{JITSI_SERVICE_UUID}}
+    external: true

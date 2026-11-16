@@ -1,0 +1,1 @@
+ALTER TABLE "room_moderators" ADD COLUMN "can_start" boolean DEFAULT false NOT NULL;

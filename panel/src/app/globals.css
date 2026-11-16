@@ -1,0 +1,765 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * WHITE LABEL: a identidade visual inteira vive nestes tokens.
+ * Para trocar de marca, edite --primary (cor), --radius (arredondamento)
+ * e a fonte em layout.tsx. Nenhum componente tem cor fixa.
+ */
+:root {
+  --background: #f2f6fc;
+  --foreground: #0a1a33;
+  --card: #ffffff;
+  --card-foreground: #0a1a33;
+  --popover: #ffffff;
+  --popover-foreground: #0a1a33;
+  /* Destaque do tema claro (azul do produto por padrão); o painel injeta --accent-light (e o texto sobre ele) no <html>. */
+  --primary: var(--accent-light, #0a74e6);
+  --primary-foreground: var(--accent-light-fg, #ffffff);
+  --secondary: #eaf0f9;
+  --secondary-foreground: #0a1a33;
+  --muted: #eaf0f9;
+  --muted-foreground: #566a88;
+  --accent: rgba(10, 26, 51, 0.045);
+  --accent-foreground: #0a1a33;
+  --destructive: oklch(0.52 0.22 27);
+  --border: #e0e7f2;
+  --input: #d3dcea;
+  --ring: #38a3ff;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #566a88;
+  --sidebar-primary: #0a74e6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(10, 98, 212, 0.09);
+  --sidebar-accent-foreground: #0a4fb0;
+  --sidebar-border: #e0e7f2;
+  --sidebar-ring: #38a3ff;
+
+  /* Extras do design (docs/DESIGN.md) */
+  --link: #0a62d4;
+  --icon-bg: rgba(10, 98, 212, 0.09);
+  --icon-fg: #0a62d4;
+  --status-off: #8a9bb5;
+  --faint: #5f7390;
+  --shadow-card: 0 1px 2px rgba(10, 26, 51, 0.05), 0 10px 28px rgba(10, 26, 51, 0.05);
+  --page-glow: radial-gradient(900px 420px at 10% -10%, rgba(10, 110, 255, 0.08), transparent 62%);
+  --radius: 0.75rem;
+
+  /* Movimento (guia do Emil Kowalski): curvas fortes, nunca ease-in em UI. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Ease-out forte (a mesma do drawer do animations.dev / Vaul). */
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --duration-press: 140ms;
+  --duration-ui: 200ms;
+  --duration-panel: 200ms;
+  /* Mola (spring) como easing CSS: sobe um pouco além de 1 e assenta. Gerada de duração 0.28 s / bounce 0.4. */
+  --ease-spring-press: linear(0, 0.016, 0.058, 0.12, 0.196, 0.282, 0.372, 0.463, 0.552, 0.638, 0.717, 0.789, 0.853, 0.909, 0.957, 0.996, 1.028, 1.053, 1.071, 1.084, 1.091, 1.094, 1.094, 1.091, 1.086, 1.079, 1.072, 1.063, 1.055, 1.046, 1.038, 1.03, 1.023, 1.016, 1.011, 1.006, 1);
+}
+
+/* Tema padrão do produto: escuro. */
+.dark {
+  --background: #040b17;
+  --foreground: #eef4ff;
+  --card: #0e1626;
+  --card-foreground: #eef4ff;
+  --popover: #0e1626;
+  --popover-foreground: #eef4ff;
+  /* Destaque do tema escuro (azul do produto por padrão); o painel injeta --accent-dark (e o texto sobre ele) no <html>. */
+  --primary: var(--accent-dark, #0a74e6);
+  --primary-foreground: var(--accent-dark-fg, #ffffff);
+  --secondary: rgba(255, 255, 255, 0.07);
+  --secondary-foreground: #eef4ff;
+  --muted: rgba(255, 255, 255, 0.07);
+  --muted-foreground: #93a6c4;
+  --accent: rgba(255, 255, 255, 0.06);
+  --accent-foreground: #eef4ff;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.13);
+  --ring: #38a3ff;
+
+  --sidebar: #071220;
+  --sidebar-foreground: #93a6c4;
+  --sidebar-primary: #0a74e6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(56, 163, 255, 0.15);
+  --sidebar-accent-foreground: #d6ebff;
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-ring: #38a3ff;
+
+  --link: #5db4ff;
+  --icon-bg: rgba(56, 163, 255, 0.14);
+  --icon-fg: #6bbcff;
+  --status-off: #7f94b3;
+  --faint: #7488a8;
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 14px 34px rgba(0, 0, 0, 0.35);
+  --page-glow:
+    radial-gradient(900px 460px at 12% -8%, rgba(10, 110, 255, 0.2), transparent 62%),
+    radial-gradient(760px 420px at 100% 4%, rgba(70, 80, 210, 0.15), transparent 62%);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-heading);
+  --color-link: var(--link);
+  --color-icon-bg: var(--icon-bg);
+  --color-icon-fg: var(--icon-fg);
+  --color-status-off: var(--status-off);
+  --color-faint: var(--faint);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --shadow-card: var(--shadow-card);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --ease-out: var(--ease-out);
+  --ease-in-out: var(--ease-in-out);
+  --ease-drawer: var(--ease-drawer);
+}
+
+/* Fundo das páginas de entrada (vídeo ou imagem). Filtro, mistura e opacidade ficam no contêiner para a mistura valer com o fundo da página. */
+.entry-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  filter: var(--bg-filter-light, none);
+  mix-blend-mode: var(--bg-blend-light, normal);
+  opacity: var(--bg-opacity-light, 1);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+.dark .entry-bg {
+  filter: var(--bg-filter-dark, none);
+  mix-blend-mode: var(--bg-blend-dark, normal);
+  opacity: var(--bg-opacity-dark, 1);
+}
+.entry-bg-contained {
+  position: absolute;
+}
+.entry-bg > video,
+.entry-bg > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--bg-x-light, 50%) 50%;
+}
+.dark .entry-bg > video,
+.dark .entry-bg > img {
+  object-position: var(--bg-x-dark, 50%) 50%;
+}
+
+/* Rádios do design: controle de 18 px na cor de destaque do design. */
+input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #0a84ff;
+  flex-shrink: 0;
+}
+
+/* Utilitários do design (docs/DESIGN.md) */
+/* Botão primário: degradê feito a partir da cor de destaque (--primary), então acompanha a cor escolhida em Personalização. */
+.btn-gradient {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--primary) 90%, #000), color-mix(in oklab, var(--primary) 88%, #fff));
+  color: var(--primary-foreground, #fff);
+  box-shadow: 0 8px 22px color-mix(in oklab, var(--primary) 30%, transparent);
+}
+.page-glow {
+  background-image: var(--page-glow);
+}
+/* Títulos em Space Grotesk; as telas públicas (login etc.) mantêm a fonte e o espaçamento que já tinham. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading), var(--font-sans), sans-serif;
+  letter-spacing: -0.02em;
+}
+.auth-page,
+.auth-page h1,
+.auth-page h2,
+.auth-page h3 {
+  font-family: var(--font-auth), sans-serif;
+}
+
+/*
+ * Painel (/settings): os textos usam até 90% da largura do que os contém (cartão, formulário ou página), em vez de quebrar cedo
+ * numa largura fixa. Fica fora do @layer e é !important para valer sobre qualquer max-w-* (inclusive max-w-none!).
+ */
+[data-panel] main :is(p, [data-slot="alert-description"]) {
+  max-width: 90% !important;
+}
+
+@layer base {
+  /* Painel (/settings): barra de rolagem sempre visível, mesmo em páginas curtas, para a largura não mudar de uma tela para outra. */
+  html:has([data-panel]) {
+    overflow-y: scroll;
+  }
+  /* O Tailwind zera o cursor dos botões: tudo que se clica mostra a mãozinha; o que está desligado mostra "proibido". */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"],
+  [role="switch"]:not([data-disabled]),
+  [role="menuitem"],
+  [role="option"],
+  summary,
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="file"]:not(:disabled),
+  input[type="color"]:not(:disabled),
+  label[for]:not(:has(+ :disabled)) {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  [role="switch"][data-disabled] {
+    cursor: not-allowed;
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/*
+ * Movimento com respeito a quem pede menos movimento: some o deslocamento e a
+ * escala; ficam só as transições de opacidade e cor, que ajudam a entender.
+ * (As animações do tw-animate-css usam estas variáveis; o painel lateral e os
+ * botões usam as propriedades translate/scale.)
+ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-in,
+  .animate-out {
+    --tw-enter-translate-x: 0 !important;
+    --tw-enter-translate-y: 0 !important;
+    --tw-enter-scale: 1 !important;
+    --tw-exit-translate-x: 0 !important;
+    --tw-exit-translate-y: 0 !important;
+    --tw-exit-scale: 1 !important;
+  }
+  [data-slot="sheet-content"],
+  [data-slot="button"] {
+    translate: none !important;
+    scale: none !important;
+  }
+}
+
+/*
+ * Botões: ao apertar, encolhem rápido (90 ms); ao soltar, voltam com uma mola curta (294 ms).
+ * Só transform e cores; nunca `transition: all`.
+ */
+@layer components {
+  [data-slot="button"] {
+    transition:
+      transform 294ms var(--ease-spring-press),
+      background-color var(--duration-press) var(--ease-out),
+      color var(--duration-press) var(--ease-out),
+      border-color var(--duration-press) var(--ease-out),
+      box-shadow var(--duration-press) var(--ease-out),
+      opacity var(--duration-press) var(--ease-out);
+  }
+  [data-slot="button"]:active:not([aria-haspopup]):not(:disabled) {
+    transform: scale(0.95);
+    transition:
+      transform 90ms var(--ease-out),
+      background-color var(--duration-press) var(--ease-out),
+      color var(--duration-press) var(--ease-out);
+  }
+}
+
+/*
+ * Notificações (Sonner): mais presença sem custo de desempenho. Só sombra e bordas estáticas
+ * (nada de blur/backdrop-filter sobre o vídeo, nada animado além do que o Sonner já faz).
+ * O visual do aviso é TRAVADO: todas as cores são valores fixos aqui, não vêm dos tokens do sistema
+ * (--primary, --card, --border etc.) nem mudam com a cor de destaque escolhida em Personalização.
+ * Verde (padrão, informação e sucesso) #1AC43D · vermelho (erro) · amarelo (atenção).
+ */
+[data-sonner-toaster] [data-sonner-toast].cn-toast {
+  --toast-accent: #1ac43d;
+  --toast-bg: #ffffff;
+  --toast-fg: #0a1a33;
+  --toast-border: #e0e7f2;
+  --toast-muted: #566a88;
+  padding: 14px 16px 14px 18px;
+  font-size: 14px;
+  border-radius: 12px;
+  background: var(--toast-bg);
+  color: var(--toast-fg);
+  border: 1px solid color-mix(in oklch, var(--toast-accent) 45%, var(--toast-border));
+  box-shadow:
+    inset 4px 0 0 var(--toast-accent),
+    inset 0 1px 0 oklch(1 0 0 / 7%),
+    0 16px 40px -10px oklch(0 0 0 / 70%),
+    0 0 0 3px color-mix(in oklch, var(--toast-accent) 10%, transparent);
+}
+.dark [data-sonner-toaster] [data-sonner-toast].cn-toast {
+  --toast-bg: #0e1626;
+  --toast-fg: #eef4ff;
+  --toast-border: rgba(255, 255, 255, 0.09);
+  --toast-muted: #93a6c4;
+}
+[data-sonner-toaster] [data-sonner-toast].cn-toast[data-type="error"] {
+  --toast-accent: oklch(0.52 0.22 27);
+}
+.dark [data-sonner-toaster] [data-sonner-toast].cn-toast[data-type="error"] {
+  --toast-accent: oklch(0.704 0.191 22.216);
+}
+[data-sonner-toaster] [data-sonner-toast].cn-toast[data-type="warning"] {
+  --toast-accent: #eab308;
+}
+[data-sonner-toaster] [data-sonner-toast].cn-toast [data-title] {
+  font-weight: 600;
+}
+[data-sonner-toaster] [data-sonner-toast].cn-toast [data-description] {
+  color: var(--toast-muted);
+}
+
+/* Campos de data/hora nativos: o ícone do calendário acompanha o tema (claro no escuro, escuro no claro). */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color-scheme: light;
+}
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * Telas públicas (login, primeiro acesso, 2FA, recuperação de senha): sempre escuras, com a cor
+ * de destaque (--primary) em degradês, luz e neon. Só gradientes e sombras (sem blur).
+ * Sem barra de rolagem visível (a página ainda rola, se a tela for baixa demais para o formulário).
+ * ------------------------------------------------------------------------------------------- */
+html:has(.auth-page) {
+  scrollbar-width: none;
+}
+html:has(.auth-page)::-webkit-scrollbar {
+  display: none;
+}
+.auth-page {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  overflow: hidden;
+  isolation: isolate;
+  --primary: var(--auth-primary, #0a84ff);
+  --primary-foreground: var(--auth-btn-fg, #ffffff);
+  background: linear-gradient(180deg, var(--auth-bg-a, #041c38) 0%, var(--auth-bg-b, #021a36) 40%, var(--auth-bg-c, #00142d) 100%);
+  color: #fff;
+}
+/* Toda a composição fica num palco de no máximo 1366 px, centralizado. */
+.auth-stage {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 1366px;
+  flex: 1;
+  flex-direction: column;
+  margin-inline: auto;
+  container-type: inline-size;
+}
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+/* Luzes em diagonal: duas grandes nas pontas (tons diferentes) e uma menor no centro */
+.auth-glow {
+  position: absolute;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+}
+.auth-glow-a {
+  left: 21%;
+  top: 26%;
+  width: 58%;
+  background: radial-gradient(closest-side, var(--auth-glow-a1, #064386) 0%, var(--auth-glow-a2, rgb(6 67 134 / 0.6)) 35%, var(--auth-glow-a3, rgb(6 44 91 / 0.3)) 65%, transparent 100%);
+}
+.auth-glow-b {
+  left: 82%;
+  top: 76%;
+  width: 62%;
+  background: radial-gradient(closest-side, var(--auth-glow-b1, #15204e) 0%, var(--auth-glow-b2, rgb(21 32 78 / 0.6)) 45%, transparent 100%);
+}
+.auth-glow-c {
+  left: 43%;
+  top: 43%;
+  width: 28%;
+  background: radial-gradient(closest-side, var(--auth-glow-c, rgb(27 57 93 / 0.75)), transparent 100%);
+}
+/* Película de vidro em forma de trapézio (V) sob o fundo: só o interior clareia, o lado de fora não muda */
+.auth-film {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 100% 0, 69.5% 100%, 30.5% 100%);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.01) 0%, rgb(255 255 255 / 0.02) 100%);
+}
+
+/* GlassCard (componente reutilizável): cartão de vidro (CSS copiado de um gerador de glassmorphism): quase sem cor própria, blur + saturação,
+   borda em degradê fina e luzes internas bem suaves. As camadas ficam em spans .glass-card-* dentro do cartão. */
+.glass-card {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.016);
+  -webkit-backdrop-filter: blur(15px) saturate(1.2);
+  backdrop-filter: blur(15px) saturate(1.2);
+  /* Camada própria e isolada: evita faixas piscantes quando o vídeo de fundo e a prévia da câmera tocam ao mesmo tempo. */
+  isolation: isolate;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  border: 1px solid transparent;
+  border-radius: 30px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.094),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.047);
+}
+/* Vidro da etapa com a prévia da câmera (dois vídeos tocando): mesmos valores do vidro das outras telas (desfoque 15 px, cor base clara). A
+   correção da faixa piscante está na mistura do fundo (regra abaixo) e nas camadas próprias dos vídeos. O "opacity(1)" é um filtro neutro que
+   força o Chromium a reavaliar a camada. */
+.glass-card-lite {
+  -webkit-backdrop-filter: blur(15px) saturate(1.2) opacity(1);
+  backdrop-filter: blur(15px) saturate(1.2) opacity(1);
+}
+/* Nessa etapa, o fundo em vídeo (tema escuro) deixa de usar mix-blend-mode: o desfoque do cartão por cima de uma camada misturada é o conflito
+   clássico que faz o Chromium redesenhar por faixas. A cor de fundo do tema entra por baixo, para o escuro do vídeo seguir parecido. */
+.dark main:has(.glass-card-lite) .entry-bg {
+  mix-blend-mode: normal;
+  background-color: var(--background);
+}
+/* Os dois vídeos da etapa (fundo e prévia da câmera) em camadas próprias da GPU. */
+.entry-bg > video,
+.glass-card video {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+.glass-card-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  padding: 1px;
+  background: linear-gradient(180deg, rgba(57, 57, 57, 0.21) 1%, rgba(151, 151, 151, 0.35) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.glass-card-top {
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.145), transparent);
+  pointer-events: none;
+}
+.glass-card-left {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  width: 1px;
+  height: 80%;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.094), transparent);
+  pointer-events: none;
+}
+.glass-card-inner {
+  position: absolute;
+  inset: 1px;
+  border-radius: 19px;
+  box-shadow:
+    inset 0 0 2px 0 rgba(255, 255, 255, 0.15),
+    inset 0 2px 4px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 2px 0 rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+.glass-card-sheen {
+  position: absolute;
+  inset: 2px;
+  border-radius: 18px;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+/* Só na etapa da câmera (dois vídeos tocando): reflexo sem modo de mistura, para não reintroduzir a faixa piscante. */
+.glass-card-lite .glass-card-sheen {
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  mix-blend-mode: normal;
+}
+.auth-card label {
+  color: rgb(255 255 255 / 0.92);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.auth-card form {
+  gap: 1.4rem;
+}
+.auth-card [data-slot="input"] {
+  height: 3.2rem;
+  max-width: none;
+  border-radius: 0.875rem;
+  border-color: rgb(255 255 255 / 0.09);
+  background: var(--auth-input, rgb(6 18 40 / 0.5));
+  font-size: 0.9375rem;
+  color: #fff;
+}
+.auth-card [data-slot="input"]:focus-visible {
+  border-color: var(--primary);
+  box-shadow: none;
+}
+.auth-card [data-slot="button"][type="submit"] {
+  height: 3.4rem;
+  border-radius: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--auth-btn-1, #007dfe) 0%, var(--auth-btn-2, #009eff) 50%, var(--auth-btn-3, #00c0ff) 100%);
+  color: var(--auth-btn-fg, #ffffff);
+  box-shadow: 0 10px 30px -12px var(--auth-btn-shadow, rgb(0 158 255 / 0.55));
+}
+.auth-card [data-slot="button"][type="submit"]:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+.auth-link {
+  color: var(--primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth-link:hover,
+.auth-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Animação da página "sala não encontrada" (RoomNotFoundScene): notebook que tenta entrar na sala e mostra o erro. Sem tratamento de "reduzir movimento": estas animações sempre rodam (decisão do produto). */
+.rnf-pa{animation:rnf-phaseA 8s ease-in-out infinite}
+.rnf-pb{animation:rnf-phaseB 8s cubic-bezier(.2,.8,.2,1) infinite}
+.rnf-spin{animation:rnf-spin .7s linear infinite;transform-box:fill-box;transform-origin:center}
+.rnf-bar{animation:rnf-bar 8s ease-in-out infinite;transform-origin:244px 430px}
+.rnf-glow{animation:rnf-glow 8s ease-in-out infinite}
+.rnf-led{animation:rnf-led 8s ease-in-out infinite}
+.rnf-shake{animation:rnf-shake 8s ease-out infinite}
+.rnf-ripple{animation:rnf-ripple 8s ease-out infinite;transform-box:fill-box;transform-origin:center;opacity:0}
+.rnf-twinkle{animation:rnf-twinkle 3.6s ease-in-out infinite}
+.rnf-twinkle2{animation:rnf-twinkle 4.4s ease-in-out -1.5s infinite}
+.rnf-dots{animation:rnf-dots 1.2s steps(1,end) infinite}
+.rnf-steam{animation:rnf-steam 4s ease-in-out infinite}
+.rnf-steam2{animation:rnf-steam 4s ease-in-out -2s infinite}
+
+@keyframes rnf-spin{to{transform:rotate(360deg)}}
+@keyframes rnf-phaseA{
+0%{opacity:0}
+4%{opacity:1}
+29%{opacity:1}
+34%{opacity:0}
+100%{opacity:0}
+}
+@keyframes rnf-phaseB{
+0%,34%{opacity:0;transform:translateY(10px)}
+41%{opacity:1;transform:translateY(0)}
+91%{opacity:1;transform:translateY(0)}
+96%,100%{opacity:0;transform:translateY(0)}
+}
+@keyframes rnf-bar{
+0%{transform:scaleX(0);opacity:1;fill:var(--primary)}
+3%{transform:scaleX(0.03);fill:var(--primary)}
+14%{transform:scaleX(0.45);fill:var(--primary)}
+22%{transform:scaleX(0.62)}
+29%{transform:scaleX(0.7);fill:var(--primary)}
+34%{transform:scaleX(0.7);fill:#ff5c5c}
+91%{transform:scaleX(0.7);opacity:1;fill:#ff5c5c}
+96%{transform:scaleX(0.7);opacity:0;fill:#ff5c5c}
+96.1%{transform:scaleX(0);opacity:0;fill:var(--primary)}
+100%{transform:scaleX(0);opacity:1;fill:var(--primary)}
+}
+@keyframes rnf-glow{
+0%,29%{fill:var(--primary)}
+35%,91%{fill:#ff4d4d}
+97%,100%{fill:var(--primary)}
+}
+@keyframes rnf-led{
+0%{fill:var(--primary);opacity:.4}
+7%{opacity:1}
+14%{opacity:.4}
+21%{opacity:1}
+29%{fill:var(--primary);opacity:1}
+35%{fill:#ff5c5c;opacity:1}
+91%{fill:#ff5c5c;opacity:1}
+97%{fill:var(--primary);opacity:.4}
+100%{fill:var(--primary);opacity:.4}
+}
+@keyframes rnf-shake{
+0%,34%{transform:translateX(0)}
+36%{transform:translateX(-5px)}
+38%{transform:translateX(4px)}
+40%{transform:translateX(-3px)}
+42%{transform:translateX(2px)}
+44%,100%{transform:translateX(0)}
+}
+@keyframes rnf-ripple{
+0%,35%{opacity:0;transform:scale(1)}
+36%{opacity:.7;transform:scale(1)}
+52%{opacity:0;transform:scale(2.4)}
+100%{opacity:0;transform:scale(2.4)}
+}
+@keyframes rnf-twinkle{
+0%,100%{opacity:.35}
+50%{opacity:1}
+}
+@keyframes rnf-steam{
+0%{opacity:0;transform:translateY(8px)}
+30%{opacity:.5}
+100%{opacity:0;transform:translateY(-10px)}
+}
+@keyframes rnf-dots{
+0%{opacity:.55}
+50%{opacity:1}
+}
+
+
+/* Animações das páginas de saída (ExitSceneLeft, ExitSceneKicked, ExitSceneEnded): reunião em andamento e o desfecho de cada caso. */
+.sl-twinkle{animation:sl-twinkle 3.6s ease-in-out infinite}
+.sl-twinkle2{animation:sl-twinkle 4.4s ease-in-out -1.5s infinite}
+.sl-steam{animation:sl-steam 4s ease-in-out infinite}
+.sl-steam2{animation:sl-steam 4s ease-in-out -2s infinite}
+.sl-speak{animation:sl-speak 1.4s ease-in-out infinite}
+.sl-tile{transform-box:fill-box;transform-origin:center}
+@keyframes sl-twinkle{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes sl-steam{0%{opacity:0;transform:translateY(8px)}30%{opacity:.5}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes sl-speak{0%,100%{opacity:.2}50%{opacity:1}}
+.sl-grid{animation:sl-g1 8s ease-in-out infinite;transform-origin:470px 308px}
+.sl-toolbar{animation:sl-tb1 8s ease-in-out infinite}
+.sl-hang{animation:sl-hang1 8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.sl-hangring{animation:sl-hr1 8s ease-out infinite;transform-box:fill-box;transform-origin:center;opacity:0}
+.sl-badge{animation:sl-bd1 8s cubic-bezier(.2,.8,.2,1) infinite;transform-origin:470px 308px}
+.sl-arrow{animation:sl-nudge 1.6s ease-in-out infinite}
+.sl-ring{animation:sl-ringp 2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.sl-ring2{animation:sl-ringp 2s ease-out -1s infinite;transform-box:fill-box;transform-origin:center}
+.sl-glow{animation:sl-gl1 8s ease-in-out infinite}
+.sl-led{animation:sl-led1 8s ease-in-out infinite}
+@keyframes sl-g1{0%{opacity:0;transform:scale(.98)}5%{opacity:1;transform:scale(1)}30%{opacity:1;transform:scale(1)}40%{opacity:.14;transform:scale(.97)}91%{opacity:.14;transform:scale(.97)}96%,100%{opacity:0;transform:scale(.97)}}
+@keyframes sl-tb1{0%{opacity:0}5%{opacity:1}30%{opacity:1}36%{opacity:0}100%{opacity:0}}
+@keyframes sl-hang1{0%,17%{transform:scale(1)}20%{transform:scale(.84)}24%{transform:scale(1.08)}27%,100%{transform:scale(1)}}
+@keyframes sl-hr1{0%,19%{opacity:0;transform:scale(1)}20%{opacity:.8;transform:scale(1)}30%{opacity:0;transform:scale(2.2)}100%{opacity:0;transform:scale(2.2)}}
+@keyframes sl-bd1{0%,31%{opacity:0;transform:scale(.6)}40%{opacity:1;transform:scale(1)}91%{opacity:1;transform:scale(1)}96%,100%{opacity:0;transform:scale(1)}}
+@keyframes sl-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(7px)}}
+@keyframes sl-ringp{0%{opacity:.55;transform:scale(1)}100%{opacity:0;transform:scale(1.9)}}
+@keyframes sl-gl1{0%,30%{fill:var(--primary);opacity:.3}40%,91%{fill:var(--primary);opacity:.08}100%{fill:var(--primary);opacity:.3}}
+@keyframes sl-led1{0%{fill:var(--primary);opacity:.4}8%{opacity:1}16%{opacity:.4}24%{opacity:1}30%{fill:var(--primary);opacity:1}40%,91%{fill:#5b6b86;opacity:.6}100%{fill:var(--primary);opacity:.4}}
+
+.sk-twinkle{animation:sk-twinkle 3.6s ease-in-out infinite}
+.sk-twinkle2{animation:sk-twinkle 4.4s ease-in-out -1.5s infinite}
+.sk-steam{animation:sk-steam 4s ease-in-out infinite}
+.sk-steam2{animation:sk-steam 4s ease-in-out -2s infinite}
+.speak{animation:sk-speak 1.4s ease-in-out infinite}
+.sk-tile{transform-box:fill-box;transform-origin:center}
+@keyframes sk-twinkle{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes sk-steam{0%{opacity:0;transform:translateY(8px)}30%{opacity:.5}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes sk-speak{0%,100%{opacity:.2}50%{opacity:1}}
+.sk-grid{animation:sk-g2 8s ease-in-out infinite;transform-origin:470px 308px}
+.sk-toolbar{animation:sk-tb2 8s ease-in-out infinite}
+.sk-mod{animation:sk-mod2 8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.sk-self{animation:sk-self2 8s ease-in-out infinite}
+.sk-selfb{animation:sk-selfb2 8s ease-in-out infinite}
+.sk-badge{animation:sk-bd2 8s cubic-bezier(.2,.8,.2,1) infinite;transform-origin:470px 308px}
+.sk-ring{animation:sk-ringp 2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.sk-ring2{animation:sk-ringp 2s ease-out -1s infinite;transform-box:fill-box;transform-origin:center}
+.sk-glow{animation:sk-gl2 8s ease-in-out infinite}
+.sk-led{animation:sk-led2 8s ease-in-out infinite}
+@keyframes sk-g2{0%{opacity:0;transform:scale(.98)}5%{opacity:1;transform:scale(1)}38%{opacity:1;transform:scale(1)}46%{opacity:.14;transform:scale(.97)}91%{opacity:.14;transform:scale(.97)}96%,100%{opacity:0;transform:scale(.97)}}
+@keyframes sk-tb2{0%{opacity:0}5%{opacity:1}38%{opacity:1}44%{opacity:0}100%{opacity:0}}
+@keyframes sk-mod2{0%,12%{transform:scale(1)}16%{transform:scale(1.3)}20%{transform:scale(1)}100%{transform:scale(1)}}
+@keyframes sk-self2{0%,22%{transform:translateX(0);opacity:1}24%{transform:translateX(-4px)}26%{transform:translateX(4px)}28%{transform:translateX(-3px)}30%{transform:translateX(0);opacity:1}38%{transform:translateX(56px);opacity:0}100%{transform:translateX(56px);opacity:0}}
+@keyframes sk-selfb2{0%,21%{stroke:var(--primary)}24%,100%{stroke:#ff5c5c}}
+@keyframes sk-bd2{0%,39%{opacity:0;transform:scale(.6)}48%{opacity:1;transform:scale(1)}91%{opacity:1;transform:scale(1)}96%,100%{opacity:0;transform:scale(1)}}
+@keyframes sk-ringp{0%{opacity:.55;transform:scale(1)}100%{opacity:0;transform:scale(1.9)}}
+@keyframes sk-gl2{0%,22%{fill:var(--primary);opacity:.3}30%,91%{fill:#ff4d4d;opacity:.3}100%{fill:var(--primary);opacity:.3}}
+@keyframes sk-led2{0%{fill:var(--primary);opacity:.4}8%{opacity:1}16%{opacity:.4}22%{fill:var(--primary);opacity:1}30%,91%{fill:#ff5c5c;opacity:1}100%{fill:var(--primary);opacity:.4}}
+
+.se-twinkle{animation:se-twinkle 3.6s ease-in-out infinite}
+.se-twinkle2{animation:se-twinkle 4.4s ease-in-out -1.5s infinite}
+.se-steam{animation:se-steam 4s ease-in-out infinite}
+.se-steam2{animation:se-steam 4s ease-in-out -2s infinite}
+.se-speak{animation:se-speak 1.4s ease-in-out infinite}
+.se-tile{transform-box:fill-box;transform-origin:center}
+@keyframes se-twinkle{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes se-steam{0%{opacity:0;transform:translateY(8px)}30%{opacity:.5}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes se-speak{0%,100%{opacity:.2}50%{opacity:1}}
+.se-t1{animation:se-t3_1 8s ease-in-out infinite}
+.se-t2{animation:se-t3_2 8s ease-in-out infinite}
+.se-t3{animation:se-t3_3 8s ease-in-out infinite}
+.se-t4{animation:se-t3_4 8s ease-in-out infinite}
+@keyframes se-t3_1{0%{opacity:0;transform:scale(.96)}5%{opacity:1;transform:scale(1)}24%{opacity:1;transform:scale(1)}32%{opacity:0;transform:scale(.55)}100%{opacity:0;transform:scale(.55)}}
+@keyframes se-t3_2{0%{opacity:0;transform:scale(.96)}5%{opacity:1;transform:scale(1)}30%{opacity:1;transform:scale(1)}38%{opacity:0;transform:scale(.55)}100%{opacity:0;transform:scale(.55)}}
+@keyframes se-t3_3{0%{opacity:0;transform:scale(.96)}5%{opacity:1;transform:scale(1)}36%{opacity:1;transform:scale(1)}44%{opacity:0;transform:scale(.55)}100%{opacity:0;transform:scale(.55)}}
+@keyframes se-t3_4{0%{opacity:0;transform:scale(.96)}5%{opacity:1;transform:scale(1)}42%{opacity:1;transform:scale(1)}50%{opacity:0;transform:scale(.55)}100%{opacity:0;transform:scale(.55)}}
+.se-toolbar{animation:se-tb3 8s ease-in-out infinite}
+.se-badge{animation:se-bd3 8s ease-in-out infinite}
+.se-base{animation:se-base3 8s ease-in-out infinite}
+.se-draw{stroke-dasharray:213.6;animation:se-draw3 8s ease-in-out infinite}
+.se-tick{stroke-dasharray:41;animation:se-tick3 8s ease-in-out infinite}
+.se-spark{animation:se-spark 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.se-glow{animation:se-gl3 8s ease-in-out infinite}
+.se-led{animation:se-led3 8s ease-in-out infinite}
+@keyframes se-tb3{0%{opacity:0}5%{opacity:1}46%{opacity:1}52%{opacity:0}100%{opacity:0}}
+@keyframes se-bd3{0%,48%{opacity:0}52%{opacity:1}91%{opacity:1}96%,100%{opacity:0}}
+@keyframes se-base3{0%,48%{transform:scale(.7)}56%{transform:scale(1.06)}60%,100%{transform:scale(1)}}
+@keyframes se-draw3{0%,50%{stroke-dashoffset:213.6}62%,100%{stroke-dashoffset:0}}
+@keyframes se-tick3{0%,60%{stroke-dashoffset:41}68%,100%{stroke-dashoffset:0}}
+@keyframes se-spark{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1)}}
+@keyframes se-gl3{0%,46%{fill:var(--primary);opacity:.3}54%,91%{fill:#34d399;opacity:.3}100%{fill:var(--primary);opacity:.3}}
+@keyframes se-led3{0%{fill:var(--primary);opacity:.4}8%{opacity:1}16%{opacity:.4}24%{opacity:1}46%{fill:var(--primary);opacity:1}54%,91%{fill:#34d399;opacity:1}100%{fill:var(--primary);opacity:.4}}
+
+/* Robô da página 404: flutua devagar (para com "reduzir movimento"). */
+.nf-float { animation: nf-float 5s ease-in-out infinite; }
+@keyframes nf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@media (prefers-reduced-motion: reduce) { .nf-float { animation: none; } }

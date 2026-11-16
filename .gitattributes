@@ -1,0 +1,7 @@
+# Tudo em LF no repositório (scripts e arquivos de configuração rodam em Linux).
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.mp4 binary
+*.ico binary
